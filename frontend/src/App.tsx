@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import Home from './pages/home';
+import DeckView from './pages/DeckView';
+import StudyMode from './pages/StudyMode';
+
+type Page = 'home' | 'deck' | 'study';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState<Page>('home');
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return <Home />;
+      case 'deck':
+        return <DeckView />;
+      case 'study':
+        return <StudyMode />;
+      default:
+        return <Home />;
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen bg-gray-50">
+      {/* Simple Navigation */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="container mx-auto p-4">
+          <div className="flex gap-6">
+            <button
+              onClick={() => setCurrentPage('home')}
+              className={`font-semibold ${currentPage === 'home' ? 'text-blue-600' : 'text-gray-600'}`}
+            >
+              Home
+            </button>
+            <button
+              onClick={() => setCurrentPage('deck')}
+              className={`font-semibold ${currentPage === 'deck' ? 'text-blue-600' : 'text-gray-600'}`}
+            >
+              Deck View
+            </button>
+            <button
+              onClick={() => setCurrentPage('study')}
+              className={`font-semibold ${currentPage === 'study' ? 'text-blue-600' : 'text-gray-600'}`}
+            >
+              Study Mode
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Page Content */}
+      <main>
+        {renderPage()}
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
