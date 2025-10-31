@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # User Model
 class User(SQLModel, table=True):
@@ -72,6 +72,20 @@ class Card(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     front: str  # Question or prompt
     back: str   # Answer
+
+        # # Spaced repetition fields for SM-2 algorithm can be implemented later, but for now we will use leitner
+    # ease_factor: float = Field(default=2.5)  # How easy the card is (used in algorithm)
+    # interval_days: int = Field(default=0)    # Days until next review
+    # repetitions: int = Field(default=0)      # Number of times reviewed
+    # last_reviewed: Optional[datetime] = None
+    # next_review: Optional[datetime] = None
+
+    # LEITNER SYSTEM FIELDS 
+    box: int = Field(default=1)  # Which box (1-5) the card is in
+    last_reviewed: Optional[datetime] = None  # When was it last studied
+    next_review: datetime = Field(default_factory=datetime.now)  # When to review next
+
+    #for this we are removing the .db folder for now but when you run backend it automatically creates?
     
     # Spaced repetition fields
     ease_factor: float = Field(default=2.5)  # How easy the card is (used in algorithm)
