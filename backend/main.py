@@ -5,7 +5,7 @@ from typing import List
 
 # Import your models and database
 from backend.database import init_db, get_session
-from backend.models.models import User, Deck, Card
+from backend.models.models import User, Deck, Card, UserCreate, UserRead, DeckCreate, DeckRead, CardCreate, CardRead
 
 # Create the FastAPI app
 app = FastAPI(title="Primrose API", version="1.0.0")
@@ -37,13 +37,14 @@ def ping():
 
 # ============== USER ROUTES ==============
 
-@app.post("/users/", response_model=User)
-def create_user(user: User, session: Session = Depends(get_session)):
+@app.post("/users/", response_model=UserRead)
+def create_user(user: UserCreate, session: Session = Depends(get_session)):
     """Create a new user"""
-    session.add(user)
+    db_user = User(**user.dict())
+    session.add(db_user)
     session.commit()
-    session.refresh(user)  # Get the ID that was auto-generated
-    return user
+    session.refresh(db_user)  # Get the ID that was auto-generated
+    return db_user
 
 @app.get("/users/", response_model=List[User])
 def get_users(session: Session = Depends(get_session)):
@@ -71,13 +72,14 @@ def delete_user(user_id: int, session: Session = Depends(get_session)):
 
 # ============== DECK ROUTES ==============
 
-@app.post("/decks/", response_model=Deck)
-def create_deck(deck: Deck, session: Session = Depends(get_session)):
+@app.post("/decks/", response_model=DeckRead)
+def create_deck(deck: DeckCreate, session: Session = Depends(get_session)):
     """Create a new deck"""
-    session.add(deck)
+    db_deck = Deck(**deck.dict())
+    session.add(db_deck)
     session.commit()
-    session.refresh(deck)
-    return deck
+    session.refresh(db_deck)
+    return db_deck
 
 @app.get("/users/{user_id}/decks", response_model=List[Deck])
 def get_user_decks(user_id: int, session: Session = Depends(get_session)):
@@ -121,14 +123,15 @@ def delete_deck(deck_id: int, session: Session = Depends(get_session)):
 
 # ============== CARD ROUTES ==============
 
-@app.post("/decks/{deck_id}/cards", response_model=Card)
-def create_card(deck_id: int, card: Card, session: Session = Depends(get_session)):
+@app.post("/decks/{deck_id}/cards", response_model=CardRead)
+def create_card(deck_id: int, card: CardCreate, session: Session = Depends(get_session)):
     """Add a card to a deck"""
     card.deck_id = deck_id
-    session.add(card)
+    db_card = Card(**card.dict())
+    session.add(db_card)
     session.commit()
-    session.refresh(card)
-    return card
+    session.refresh(db_card)
+    return db_card
 
 @app.get("/decks/{deck_id}/cards", response_model=List[Card])
 def get_deck_cards(deck_id: int, session: Session = Depends(get_session)):
