@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # User Model
 class User(SQLModel, table=True):
@@ -14,6 +14,20 @@ class User(SQLModel, table=True):
     
     # Relationship: A user can have many decks
     decks: List["Deck"] = Relationship(back_populates="owner")
+
+# User creation data
+class UserCreate(SQLModel):
+    """Data required to create a new user"""
+    username: str
+    email: str
+
+# User read data
+class UserRead(SQLModel):
+    """Data returned when reading user information"""
+    id: int
+    username: str
+    email: str
+    created_at: datetime
 
 # Deck Model
 class Deck(SQLModel, table=True):
@@ -33,6 +47,23 @@ class Deck(SQLModel, table=True):
     owner: Optional[User] = Relationship(back_populates="decks")
     cards: List["Card"] = Relationship(back_populates="deck")
 
+# Deck creation data
+class DeckCreate(SQLModel):
+    """Data required to create a new deck"""
+    title: str
+    description: Optional[str] = None
+    user_id: int
+
+# Deck read data
+class DeckRead(SQLModel):
+    """Data returned when reading deck information"""
+    id: int
+    title: str
+    description: Optional[str]
+    created_at: datetime
+    last_studied: Optional[datetime]
+    user_id: int
+
 # Card Model
 class Card(SQLModel, table=True):
     """Individual flashcard with front and back content"""
@@ -42,22 +73,35 @@ class Card(SQLModel, table=True):
     front: str  # Question or prompt
     back: str   # Answer
     
-    # # Spaced repetition fields for SM-2 algorithm can be implemented later, but for now we will use leitner
-    # ease_factor: float = Field(default=2.5)  # How easy the card is (used in algorithm)
-    # interval_days: int = Field(default=0)    # Days until next review
-    # repetitions: int = Field(default=0)      # Number of times reviewed
-    # last_reviewed: Optional[datetime] = None
-    # next_review: Optional[datetime] = None
-
-    # LEITNER SYSTEM FIELDS 
-    box: int = Field(default=1)  # Which box (1-5) the card is in
-    last_reviewed: Optional[datetime] = None  # When was it last studied
-    next_review: datetime = Field(default_factory=datetime.now)  # When to review next
-
-    #for this we are removing the .db folder for now but when you run backend it automatically creates?
+    # Spaced repetition fields
+    ease_factor: float = Field(default=2.5)  # How easy the card is (used in algorithm)
+    interval_days: int = Field(default=0)    # Days until next review
+    repetitions: int = Field(default=0)      # Number of times reviewed
+    last_reviewed: Optional[datetime] = None
+    next_review: Optional[datetime] = None
     
     # Foreign key: Links card to a deck
     deck_id: int = Field(foreign_key="decks.id")
     
     # Relationship
     deck: Optional[Deck] = Relationship(back_populates="cards")
+
+# Card creation data
+class CardCreate(SQLModel):
+    """Data required to create a new card"""
+    front: str
+    back: str
+    deck_id: int
+
+# Card read data
+class CardRead(SQLModel):
+    """Data returned when reading card information"""
+    id: int
+    front: str
+    back: str
+    ease_factor: float
+    interval_days: int
+    repetitions: int
+    last_reviewed: Optional[datetime]
+    next_review: Optional[datetime]
+    deck_id: int
